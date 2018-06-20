@@ -30,7 +30,8 @@ Portability : GHC
    uniformD,
    exponential,
    dirichlet,
-   MonadBayes
+   MonadBayes,
+   sliceSample
  ) where
 
 import qualified Data.Map as Map
@@ -171,6 +172,11 @@ class (Monad m, HasCustomReal m,
     dirichlet ws = liftM normalize $ gammas ws where
       gammas = mapM (\w -> gamma w 1)
 
+    -- | slice sampleable term
+    -- 
+    sliceSample :: Int -> m a -> (a -> m a) -> m a
+    sliceSample 0 mu0 kern = mu0 >>= kern
+    sliceSample n mu0 kern = (sliceSample (n-1) mu0 kern) >>= kern
 
 -- | Monads for building probabilistic programs with conditioning.
 class (MonadDist m, Conditionable m) => MonadBayes m
