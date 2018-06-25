@@ -24,7 +24,8 @@ module Control.Monad.Bayes.Class (
   Conditionable,
   factor,
   condition,
-  observe
+  observe,
+  sliceSample
 ) where
 
 import Control.Monad.Trans.Class
@@ -50,6 +51,9 @@ class (IsCustomReal (CustomReal m)) => HasCustomReal m where
 -- | Type class asserting that a particular distibution can be sampled in structures of given type.
 class Distribution d => Sampleable d m where
   sample :: d -> m (Domain d)
+  sliceSample :: Int -> d -> ((Domain d) -> m (Domain d)) -> m (Domain d)
+  -- sliceSample 0 mu0 kern = sample (mu0) >>= kern
+  -- sliceSample n mu0 kern = (sliceSample (n-1) mu0 kern) >>= kern
 
 -- | Probabilistic program types that allow conditioning.
 -- Both soft and hard conditions are allowed.
@@ -79,7 +83,7 @@ instance HasCustomReal m => HasCustomReal (IdentityT m) where
   type CustomReal (IdentityT m) = CustomReal m
 
 instance (Sampleable d m, Monad m) => Sampleable d (IdentityT m) where
-  sample = lift . sample
+  sample = lift . sample 
 
 instance (Conditionable m, Monad m) => Conditionable (IdentityT m) where
   factor = lift . factor

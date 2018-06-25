@@ -30,8 +30,8 @@ Portability : GHC
    uniformD,
    exponential,
    dirichlet,
-   MonadBayes,
-   sliceSample
+   MonadBayes
+  --  sliceSample
  ) where
 
 import qualified Data.Map as Map
@@ -91,12 +91,16 @@ logDiscrete = sample . logDiscreteDist
 
 -- | Monads for building generative probabilistic models.
 -- The class does not specify any conditioning primitives.
-class (Monad m, HasCustomReal m,
-       Sampleable (Normal (CustomReal m)) m, Sampleable (Gamma (CustomReal m)) m,
-       Sampleable (Beta (CustomReal m)) m, Sampleable (Uniform (CustomReal m)) m,
+class (Monad m, HasCustomReal m, 
+       Sampleable (Normal (CustomReal m)) m, 
+       Sampleable (Gamma (CustomReal m)) m,
+       Sampleable (Beta (CustomReal m)) m, 
+       Sampleable (Uniform (CustomReal m)) m,
        Sampleable (Discrete (CustomReal m)) m,
-       Sampleable (Unconstrained (Normal (CustomReal m))) m, Sampleable (Unconstrained (Gamma (CustomReal m))) m,
-       Sampleable (Unconstrained (Beta (CustomReal m))) m, Sampleable (Unconstrained (Uniform (CustomReal m))) m
+       Sampleable (Unconstrained (Normal (CustomReal m))) m, 
+       Sampleable (Unconstrained (Gamma (CustomReal m))) m,
+       Sampleable (Unconstrained (Beta (CustomReal m))) m, 
+       Sampleable (Unconstrained (Uniform (CustomReal m))) m
        ) => MonadDist m where
 
     -- | Categorical distribution.
@@ -174,9 +178,9 @@ class (Monad m, HasCustomReal m,
 
     -- | slice sampleable term
     -- 
-    sliceSample :: Int -> m a -> (a -> m a) -> m a
-    sliceSample 0 mu0 kern = mu0 >>= kern
-    sliceSample n mu0 kern = (sliceSample (n-1) mu0 kern) >>= kern
+    -- sliceSample :: Int -> m a -> (a -> m a) -> m a
+    -- sliceSample 0 mu0 kern = mu0 >>= kern
+    -- sliceSample n mu0 kern = (sliceSample (n-1) mu0 kern) >>= kern
 
 -- | Monads for building probabilistic programs with conditioning.
 class (MonadDist m, Conditionable m) => MonadBayes m

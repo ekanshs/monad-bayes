@@ -60,6 +60,8 @@ instance MonadTrans Weighted where
 
 instance (Sampleable d m, Monad m) => Sampleable d (Weighted m) where
   sample = lift . sample
+  sliceSample 0 mu0 kern = sample (mu0) >>= kern
+  sliceSample n mu0 kern = (sliceSample (n-1) mu0 kern) >>= kern
 
 instance (Monad m, HasCustomReal m) => Conditionable (Weighted m) where
   factor w = Weighted $ modify (* weight w)
